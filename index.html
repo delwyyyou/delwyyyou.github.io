@@ -3,28 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" id="meta-theme" content="#1e242d">
     <title>Кот</title>
     <style>
         :root {
-            --md-sys-color-background: #1b2028;
-            --md-sys-color-surface-container: #282f3b;
-            --md-sys-color-surface-container-high: #333b4a;
-            --md-sys-color-primary: #b8caff;
-            --md-sys-color-on-primary: #0f2d68;
-            --md-sys-color-secondary-container: #414b5c;
-            --md-sys-color-shape-1: rgba(184, 202, 255, 0.14);
-            --md-sys-color-shape-2: rgba(160, 212, 198, 0.12);
+            /* Чистая холодная палитра (Серый кот) */
+            --bg: #1e242d;
+            --card: #2b3340;
+            --pill: #374152;
+            --accent: #b8caff;
+            --on-accent: #0f2d68;
+            --dot: #4c586e;
+            --shape-1: rgba(184, 202, 255, 0.14);
+            --shape-2: rgba(160, 212, 198, 0.12);
         }
 
         body.warm-theme {
-            --md-sys-color-background: #241c17;
-            --md-sys-color-surface-container: #342922;
-            --md-sys-color-surface-container-high: #42352c;
-            --md-sys-color-primary: #ffc696;
-            --md-sys-color-on-primary: #522900;
-            --md-sys-color-secondary-container: #5c493c;
-            --md-sys-color-shape-1: rgba(255, 198, 150, 0.15);
-            --md-sys-color-shape-2: rgba(242, 184, 181, 0.12);
+            /* Чистая тёплая палитра без грязи (Рыжий кот) */
+            --bg: #2c221e;
+            --card: #3d302a;
+            --pill: #4f3e37;
+            --accent: #ffccb0;
+            --on-accent: #4d2208;
+            --dot: #6b554b;
+            --shape-1: rgba(255, 204, 176, 0.15);
+            --shape-2: rgba(255, 180, 162, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -33,16 +41,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: var(--md-sys-color-background);
+            background-color: var(--bg);
             padding: 20px;
-            box-sizing: border-box;
             overflow: hidden;
             position: relative;
-            transition: background-color 0.5s cubic-bezier(0.2, 0, 0, 1);
-            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.25s ease-out;
         }
 
-        /* Декоративные фигуры Material 3 на фоне */
         .bg-shapes {
             position: fixed;
             inset: 0;
@@ -53,51 +58,47 @@
 
         .shape {
             position: absolute;
-            transition: all 0.7s cubic-bezier(0.2, 0, 0, 1);
+            transition: background-color 0.25s ease-out, fill 0.25s ease-out;
         }
 
-        /* Гугловский цветок / фестон (Scallop) */
         .shape-scallop {
             width: 340px;
             height: 340px;
             top: -70px;
             left: -80px;
-            fill: var(--md-sys-color-shape-1);
+            fill: var(--shape-1);
             animation: spinSlow 45s linear infinite;
         }
 
-        /* Сквиркл (мягкий квадрат) */
         .shape-squircle {
             width: 280px;
             height: 280px;
             bottom: -60px;
             right: -50px;
             border-radius: 76px;
-            background-color: var(--md-sys-color-shape-2);
+            background-color: var(--shape-2);
             transform: rotate(18deg);
             animation: floatShape 10s ease-in-out infinite alternate;
         }
 
-        /* Плавающая капсула (Pill) */
         .shape-pill {
             width: 180px;
             height: 84px;
             top: 16%;
             right: -35px;
             border-radius: 999px;
-            background-color: var(--md-sys-color-shape-1);
+            background-color: var(--shape-1);
             transform: rotate(-28deg);
             animation: floatShape 8s ease-in-out infinite alternate-reverse;
         }
 
-        /* Круг внизу слева */
         .shape-circle {
             width: 130px;
             height: 130px;
             bottom: 14%;
             left: -30px;
             border-radius: 50%;
-            background-color: var(--md-sys-color-shape-2);
+            background-color: var(--shape-2);
             animation: floatShape 9s ease-in-out infinite alternate;
         }
 
@@ -107,15 +108,14 @@
         }
 
         @keyframes floatShape {
-            from { translate: 0 0; }
-            to { translate: 0 -18px; }
+            from { transform: translateY(0); }
+            to { transform: translateY(-18px); }
         }
 
-        /* Основная карточка Material 3 */
         .m3-card {
             position: relative;
             z-index: 1;
-            background-color: var(--md-sys-color-surface-container);
+            background-color: var(--card);
             padding: 18px;
             border-radius: 36px;
             max-width: 440px;
@@ -124,63 +124,60 @@
             flex-direction: column;
             align-items: center;
             gap: 18px;
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
-            transition: background-color 0.5s cubic-bezier(0.2, 0, 0, 1);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+            transition: background-color 0.25s ease-out;
         }
 
         .img-wrapper {
             width: 100%;
+            aspect-ratio: 1 / 1;
             border-radius: 26px;
             overflow: hidden;
             cursor: pointer;
-            position: relative;
-            background-color: var(--md-sys-color-surface-container-high);
-            transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1);
+            background-color: var(--pill);
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
         }
 
         .img-wrapper:active {
-            transform: scale(0.96);
+            transform: scale(0.97);
         }
 
         img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
             display: block;
-            transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
         }
 
-        /* Нижняя панель управления */
         .m3-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
             width: 100%;
             padding: 2px 6px;
-            box-sizing: border-box;
         }
 
-        /* Капсульный контейнер для точек */
         .m3-pill-bar {
-            background-color: var(--md-sys-color-surface-container-high);
+            background-color: var(--pill);
             padding: 10px 16px;
             border-radius: 999px;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: background-color 0.5s cubic-bezier(0.2, 0, 0, 1);
+            transition: background-color 0.25s ease-out;
         }
 
         .dot {
             width: 10px;
             height: 10px;
             border-radius: 999px;
-            background-color: var(--md-sys-color-secondary-container);
-            transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
+            background-color: var(--dot);
+            transition: width 0.3s cubic-bezier(0.2, 0, 0, 1), background-color 0.25s ease-out;
         }
 
         .dot.active {
             width: 30px;
-            background-color: var(--md-sys-color-primary);
+            background-color: var(--accent);
         }
 
         .m3-fab {
@@ -188,25 +185,25 @@
             height: 44px;
             border-radius: 999px;
             border: none;
-            background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary);
+            background-color: var(--accent);
+            color: var(--on-accent);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+            transition: background-color 0.25s ease-out, transform 0.2s cubic-bezier(0.2, 0, 0, 1);
         }
 
         .m3-fab:active {
-            transform: scale(0.91);
+            transform: scale(0.92);
         }
 
         .m3-fab svg {
             width: 24px;
             height: 24px;
             fill: currentColor;
-            transition: transform 0.45s cubic-bezier(0.2, 0, 0, 1);
+            transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1);
         }
 
         body.warm-theme .m3-fab svg {
@@ -224,7 +221,6 @@
         <div class="shape shape-circle"></div>
     </div>
 
-    <!-- Карточка -->
     <div class="m3-card">
         <div class="img-wrapper" id="img-box">
             <img id="cat-img" src="cat.webp" alt="Кот">
@@ -250,6 +246,7 @@
         const switchBtn = document.getElementById('switch-btn');
         const dot1 = document.getElementById('dot-1');
         const dot2 = document.getElementById('dot-2');
+        const metaTheme = document.getElementById('meta-theme');
 
         const preload = new Image();
         preload.src = 'anotherCat.webp';
@@ -263,6 +260,7 @@
             document.body.classList.toggle('warm-theme', !isFirstCat);
             dot1.classList.toggle('active', isFirstCat);
             dot2.classList.toggle('active', !isFirstCat);
+            metaTheme.setAttribute('content', isFirstCat ? '#1e242d' : '#2c221e');
         }
 
         imgBox.addEventListener('click', toggleCat);
