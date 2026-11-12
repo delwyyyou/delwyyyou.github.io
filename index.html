@@ -22,10 +22,26 @@
             border-radius: 16px;
             display: block;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: transform 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        img:active {
+            transform: scale(0.97);
         }
     </style>
 </head>
 <body>
-    <img src="cat.webp" alt="Кот">
+    <img id="cat-img" src="cat.webp" alt="Кот">
+
+    <script>
+        const catImg = document.getElementById('cat-img');
+        let isFirstCat = true;
+
+        catImg.addEventListener('click', () => {
+            isFirstCat = !isFirstCat;
+            catImg.src = isFirstCat ? 'cat.webp' : 'anotherCat.webp';
+        });
+    </script>
 </body>
 </html>
