@@ -5,43 +5,175 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кот</title>
     <style>
+        :root {
+            /* Палитра Material You для серого кота */
+            --md-sys-color-background: #111318;
+            --md-sys-color-surface-container: #1d2026;
+            --md-sys-color-primary: #adc6ff;
+            --md-sys-color-on-primary: #102f60;
+            --md-sys-color-secondary-container: #3e4759;
+            --md-sys-color-on-secondary-container: #d8e2ff;
+        }
+
+        body.warm-theme {
+            /* Динамическая палитра Material You для рыжего кота */
+            --md-sys-color-background: #18120e;
+            --md-sys-color-surface-container: #251e19;
+            --md-sys-color-primary: #ffb77c;
+            --md-sys-color-on-primary: #4d2700;
+            --md-sys-color-secondary-container: #564334;
+            --md-sys-color-on-secondary-container: #ffdcbe;
+        }
+
         body {
             margin: 0;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #121212;
+            background-color: var(--md-sys-color-background);
             padding: 20px;
             box-sizing: border-box;
-        }
-        img {
-            max-width: 500px;
-            width: 100%;
-            height: auto;
-            border-radius: 16px;
-            display: block;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            cursor: pointer;
-            transition: transform 0.15s ease;
+            transition: background-color 0.5s cubic-bezier(0.2, 0, 0, 1);
             -webkit-tap-highlight-color: transparent;
         }
-        img:active {
-            transform: scale(0.97);
+
+        /* Карточка Material 3 (Surface Container) */
+        .m3-card {
+            background-color: var(--md-sys-color-surface-container);
+            padding: 16px;
+            border-radius: 32px;
+            max-width: 440px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            transition: background-color 0.5s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .img-wrapper {
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .img-wrapper:active {
+            transform: scale(0.96);
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: opacity 0.2s ease;
+        }
+
+        /* Нижняя панель с индикатором-таблеткой (Material You Pill) */
+        .m3-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 8px 4px;
+            box-sizing: border-box;
+        }
+
+        .m3-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background-color: var(--md-sys-color-secondary-container);
+            transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .dot.active {
+            width: 28px;
+            background-color: var(--md-sys-color-primary);
+        }
+
+        /* Кнопка-таблетка (Filled Tonal Icon Button) */
+        .m3-fab {
+            width: 56px;
+            height: 40px;
+            border-radius: 999px;
+            border: none;
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .m3-fab:active {
+            transform: scale(0.92);
+        }
+
+        .m3-fab svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+            transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        body.warm-theme .m3-fab svg {
+            transform: rotate(180deg);
         }
     </style>
 </head>
 <body>
-    <img id="cat-img" src="cat.webp" alt="Кот">
+    <div class="m3-card">
+        <div class="img-wrapper" id="img-box">
+            <img id="cat-img" src="cat.webp" alt="Кот">
+        </div>
+
+        <div class="m3-controls">
+            <div class="m3-dots">
+                <div class="dot active" id="dot-1"></div>
+                <div class="dot" id="dot-2"></div>
+            </div>
+
+            <button class="m3-fab" id="switch-btn" aria-label="Сменить кота">
+                <svg viewBox="0 0 24 24">
+                    <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
 
     <script>
         const catImg = document.getElementById('cat-img');
+        const imgBox = document.getElementById('img-box');
+        const switchBtn = document.getElementById('switch-btn');
+        const dot1 = document.getElementById('dot-1');
+        const dot2 = document.getElementById('dot-2');
+
+        // Предзагрузка второго кота, чтобы менялся мгновенно
+        const preload = new Image();
+        preload.src = 'anotherCat.webp';
+
         let isFirstCat = true;
 
-        catImg.addEventListener('click', () => {
+        function toggleCat() {
             isFirstCat = !isFirstCat;
             catImg.src = isFirstCat ? 'cat.webp' : 'anotherCat.webp';
-        });
+            
+            document.body.classList.toggle('warm-theme', !isFirstCat);
+            dot1.classList.toggle('active', isFirstCat);
+            dot2.classList.toggle('active', !isFirstCat);
+        }
+
+        imgBox.addEventListener('click', toggleCat);
+        switchBtn.addEventListener('click', toggleCat);
     </script>
 </body>
 </html>
