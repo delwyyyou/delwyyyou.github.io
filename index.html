@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
     <meta name="theme-color" id="meta-theme" content="#1e242d">
     <title>Кот</title>
     <style>
         :root {
-            /* Холодная палитра Material You (Серый кот) */
+            color-scheme: dark;
+            /* 1. Холодная палитра (Серый кот) */
             --bg: #1e242d;
             --card: #2b3340;
             --pill: #374152;
@@ -18,8 +20,8 @@
             --shape-2: rgba(160, 212, 198, 0.14);
         }
 
-        body.warm-theme {
-            /* Тёплая палитра Material You (Рыжий кот) */
+        body.theme-1 {
+            /* 2. Тёплая палитра (Рыжий кот) */
             --bg: #2c221e;
             --card: #3d302a;
             --pill: #4f3e37;
@@ -30,14 +32,27 @@
             --shape-2: rgba(255, 180, 162, 0.14);
         }
 
+        body.theme-2 {
+            /* 3. Мятно-шалфейная палитра (Комару) */
+            --bg: #1c2621;
+            --card: #27362f;
+            --pill: #33463d;
+            --accent: #a6f2ce;
+            --on-accent: #003824;
+            --dot: #496356;
+            --shape-1: rgba(166, 242, 206, 0.16);
+            --shape-2: rgba(183, 218, 232, 0.14);
+        }
+
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            forced-color-adjust: none;
         }
 
         body {
             margin: 0;
-            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -48,7 +63,6 @@
             transition: background-color 0.3s ease;
         }
 
-        /* 1. Фоновые фигуры Material Design 3 */
         .bg-shapes {
             position: fixed;
             inset: 0;
@@ -113,7 +127,6 @@
             to { transform: translateY(-18px); }
         }
 
-        /* 2. Зафиксированная подложка карточки */
         .m3-card {
             position: relative;
             z-index: 1;
@@ -130,7 +143,6 @@
             transition: background-color 0.3s ease;
         }
 
-        /* Жёстко зафиксированный квадратный контейнер под фото */
         .img-wrapper {
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -147,7 +159,6 @@
             transform: scale(0.97);
         }
 
-        /* 3. Плавная fade-in анимация смены картинки */
         img {
             position: absolute;
             inset: 0;
@@ -163,7 +174,6 @@
             opacity: 0;
         }
 
-        /* Нижняя панель управления */
         .m3-controls {
             display: flex;
             align-items: center;
@@ -220,10 +230,6 @@
             fill: currentColor;
             transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1);
         }
-
-        body.warm-theme .m3-fab svg {
-            transform: rotate(180deg);
-        }
     </style>
 </head>
 <body>
@@ -243,12 +249,13 @@
 
         <div class="m3-controls">
             <div class="m3-pill-bar">
-                <div class="dot active" id="dot-1"></div>
+                <div class="dot active" id="dot-0"></div>
+                <div class="dot" id="dot-1"></div>
                 <div class="dot" id="dot-2"></div>
             </div>
 
             <button class="m3-fab" id="switch-btn" aria-label="Сменить кота">
-                <svg viewBox="0 0 24 24">
+                <svg id="fab-icon" viewBox="0 0 24 24">
                     <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>
                 </svg>
             </button>
@@ -256,34 +263,52 @@
     </div>
 
     <script>
+        const cats = [
+            { src: 'cat.webp', theme: '', meta: '#1e242d' },
+            { src: 'anotherCat.webp', theme: 'theme-1', meta: '#2c221e' },
+            { src: 'onemoreanothercat.webp', theme: 'theme-2', meta: '#1c2621' }
+        ];
+
         const catImg = document.getElementById('cat-img');
         const imgBox = document.getElementById('img-box');
         const switchBtn = document.getElementById('switch-btn');
-        const dot1 = document.getElementById('dot-1');
-        const dot2 = document.getElementById('dot-2');
+        const fabIcon = document.getElementById('fab-icon');
         const metaTheme = document.getElementById('meta-theme');
+        const dots = [
+            document.getElementById('dot-0'),
+            document.getElementById('dot-1'),
+            document.getElementById('dot-2')
+        ];
 
-        const preload = new Image();
-        preload.src = 'anotherCat.webp';
+        // Предзагрузка остальных котов
+        cats.slice(1).forEach(cat => {
+            const img = new Image();
+            img.src = cat.src;
+        });
 
-        let isFirstCat = true;
+        let currentIndex = 0;
+        let rotation = 0;
         let isAnimating = false;
 
-        function toggleCat() {
+        function nextCat() {
             if (isAnimating) return;
             isAnimating = true;
-            isFirstCat = !isFirstCat;
 
-            // Сразу плавно меняем тему интерфейса и индикаторы
-            document.body.classList.toggle('warm-theme', !isFirstCat);
-            dot1.classList.toggle('active', isFirstCat);
-            dot2.classList.toggle('active', !isFirstCat);
-            metaTheme.setAttribute('content', isFirstCat ? '#1e242d' : '#2c221e');
+            currentIndex = (currentIndex + 1) % cats.length;
+            rotation += 180;
+            const currentCat = cats[currentIndex];
 
-            // Плавно гасим текущего кота и проявляем следующего
+            document.body.className = currentCat.theme;
+            metaTheme.setAttribute('content', currentCat.meta);
+            fabIcon.style.transform = `rotate(${rotation}deg)`;
+
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === currentIndex);
+            });
+
             catImg.classList.add('fade-out');
             setTimeout(() => {
-                catImg.src = isFirstCat ? 'cat.webp' : 'anotherCat.webp';
+                catImg.src = currentCat.src;
                 catImg.classList.remove('fade-out');
                 setTimeout(() => {
                     isAnimating = false;
@@ -291,8 +316,8 @@
             }, 180);
         }
 
-        imgBox.addEventListener('click', toggleCat);
-        switchBtn.addEventListener('click', toggleCat);
+        imgBox.addEventListener('click', nextCat);
+        switchBtn.addEventListener('click', nextCat);
     </script>
 </body>
 </html>
